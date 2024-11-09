@@ -5,6 +5,7 @@ import "../global.css"
 import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '@/constants/images';
 import CustomButton from '@/components/CustomButton';
+import Toast from 'react-native-toast-message';
 
 const Index = () => {
     return (
@@ -45,6 +46,7 @@ const Index = () => {
                 </View>
             </ScrollView>
             <StatusBar backgroundColor={"#161622"} barStyle={"light-content"} />
+            <Toast />
         </SafeAreaView>
     );
 };
