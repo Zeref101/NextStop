@@ -4,7 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
 import FormField from '@/components/FormField'
 import CustomButton from '@/components/CustomButton'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
+import { getCurrentUser, signin } from '@/lib/appwrite'
+import Toast from 'react-native-toast-message'
 
 const SignIn = () => {
     const [form, setForm] = React.useState({
@@ -12,8 +14,25 @@ const SignIn = () => {
         password: ''
     })
     const [isSubmitting, setIsSubmitting] = React.useState(false);
-    const submit = () => {
+    const submit = async () => {
+        if (!form.email || !form.password) {
+            Toast.show({
+                type: "error",
+                text1: 'Error',
+                text2: 'Please fill in all fields',
+                position: 'top',
+                visibilityTime: 4000,
+                autoHide: true,
+                topOffset: 30
+            })
+        } else {
 
+            // const session = signin(form.email, form.password);
+            const user = getCurrentUser();
+            console.log(user);
+            // console.log(session);
+            // router.push('/home');
+        }
     }
     return (
         <SafeAreaView className=' bg-primary h-full'>
@@ -65,6 +84,7 @@ const SignIn = () => {
                 </View>
 
             </ScrollView>
+            <Toast />
         </SafeAreaView>
     )
 }
