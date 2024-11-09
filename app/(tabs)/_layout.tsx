@@ -3,8 +3,6 @@ import { Tabs, Redirect } from 'expo-router'
 import React from 'react'
 import icons from '@/constants/icons'
 
-
-
 const TabIcon = ({ icon, color, name, focused }: { icon: ImageSourcePropType, color: string, name: string, focused: boolean }) => {
     return (
         <View className=' items-center '>
