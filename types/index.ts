@@ -14,3 +14,16 @@ export interface FormFieldProps {
   otherstyles?: string;
   keyboardType?: string;
 }
+
+export interface CreateUserProps {
+  username: string;
+  email: string;
+  password: string;
+}
+export interface UserProps {
+  accountId?: string;
+  avatar?: string;
+  email?: string;
+  password?: string;
+  username?: string;
+}
