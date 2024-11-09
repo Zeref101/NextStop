@@ -5,6 +5,10 @@ import images from '@/constants/images'
 import FormField from '@/components/FormField'
 import CustomButton from '@/components/CustomButton'
 import { Link } from 'expo-router'
+import { createUser } from '@/lib/appwrite'
+import Spinner from 'react-native-loading-spinner-overlay';
+import Toast from 'react-native-toast-message'
+
 
 const SignUp = () => {
     const [form, setForm] = React.useState({
@@ -13,8 +17,57 @@ const SignUp = () => {
         password: ''
     })
     const [isSubmitting, setIsSubmitting] = React.useState(false);
-    const submit = () => {
 
+    const delay = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
+    const submit = async () => {
+        if (!form.username || !form.email || !form.password) {
+            Toast.show({
+                type: "error",
+                text1: 'Error',
+                text2: 'Please fill in all fields',
+                position: 'top',
+                visibilityTime: 4000,
+                autoHide: true,
+                topOffset: 30
+            })
+        } else {
+            setIsSubmitting(true);
+            try {
+                await createUser({ email: form.email, password: form.password, username: form.username });
+
+                Toast.show({
+                    type: 'success',
+                    text1: 'User Created',
+                    text2: 'Your account has been created successfully!',
+                    position: 'top',
+                    visibilityTime: 3000,
+                    autoHide: true,
+                    topOffset: 30,
+                });
+                setForm({
+                    username: '',
+                    email: '',
+                    password: ''
+                });
+
+            } catch (error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'User Creation Failed',
+                    text2: 'There was an issue creating your account. Please try again.',
+                    position: 'top',
+                    visibilityTime: 3000,
+                    autoHide: true,
+                    topOffset: 30,
+                });
+                console.error(error);
+            } finally {
+                setTimeout(() => {
+                    setIsSubmitting(false);
+
+                }, 2000);
+            }
+        }
     }
     return (
         <SafeAreaView className=' bg-primary h-full'>
@@ -74,6 +127,12 @@ const SignUp = () => {
                 </View>
 
             </ScrollView>
+            <Spinner
+                visible={isSubmitting}
+                textContent={'Loading...'}
+                textStyle={{ color: '#FFF' }}
+            />
+            <Toast />
         </SafeAreaView>
     )
 }
