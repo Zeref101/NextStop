@@ -76,3 +76,12 @@ export interface BestTimeToVisit {
   best_time_to_visit: string;
   monthly_weather: MonthlyWeather[];
 }
+export interface PlaceInfo {
+  title: string;
+  img_url: string;
+  description: string;
+}
+
+export interface PlacesResponse {
+  places_info: PlaceInfo[];
+}
