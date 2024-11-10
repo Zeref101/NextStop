@@ -1,4 +1,3 @@
-import { View, Text } from 'react-native'
 import { SplashScreen, Stack } from 'expo-router'
 import React from 'react'
 import { AuthProvider } from '@/context/AuthProvider'
