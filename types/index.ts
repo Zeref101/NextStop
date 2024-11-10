@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface CustomButtonProps {
   title: string;
   handlePress?: () => void;
@@ -26,4 +28,13 @@ export interface UserProps {
   email?: string;
   password?: string;
   username?: string;
+}
+
+export interface AuthContextProps {
+  isLoggedIn: boolean;
+  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+  user: UserProps | null;
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setUser: Dispatch<SetStateAction<UserProps | null>>;
 }
