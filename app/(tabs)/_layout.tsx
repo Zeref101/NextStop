@@ -1,7 +1,7 @@
 import { View, Text, Image, ImageSourcePropType } from 'react-native'
-import { Tabs, Redirect } from 'expo-router'
+import { Tabs } from 'expo-router'
 import React from 'react'
-import icons from '@/constants/icons'
+import { tabScreens } from '@/constants'
 
 const TabIcon = ({ icon, color, name, focused }: { icon: ImageSourcePropType, color: string, name: string, focused: boolean }) => {
     return (
@@ -34,23 +34,24 @@ const TabsLayout = () => {
                     }
                 }}
             >
-                <Tabs.Screen
-                    name='home'
-                    options={{
-                        title: 'Home',
-                        headerShown: false,
-                        tabBarIcon: ({ color, focused }) => {
-                            return (
+                {tabScreens.map((tab) => (
+                    <Tabs.Screen
+                        key={tab.name}
+                        name={tab.name}
+                        options={{
+                            title: tab.title,
+                            headerShown: false,
+                            tabBarIcon: ({ color, focused }) => (
                                 <TabIcon
-                                    icon={icons.home}
+                                    icon={tab.icon}
                                     color={color}
-                                    name="Home"
+                                    name={tab.title}
                                     focused={focused}
                                 />
-                            )
-                        }
-                    }}
-                />
+                            ),
+                        }}
+                    />
+                ))}
             </Tabs>
         </>
     )
