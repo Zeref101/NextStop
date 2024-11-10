@@ -7,6 +7,7 @@ import CustomButton from '@/components/CustomButton'
 import { Link, router } from 'expo-router'
 import { getCurrentUser, signin } from '@/lib/appwrite'
 import Toast from 'react-native-toast-message'
+import { Redirect } from 'expo-router'
 
 const SignIn = () => {
     const [form, setForm] = React.useState({
@@ -27,11 +28,12 @@ const SignIn = () => {
             })
         } else {
 
-            // const session = signin(form.email, form.password);
-            const user = getCurrentUser();
-            console.log(user);
-            // console.log(session);
-            // router.push('/home');
+            const session = await signin(form.email, form.password);
+            const user = await getCurrentUser();
+
+            if (user) {
+                return <Redirect href={'/home'} />
+            }
         }
     }
     return (
