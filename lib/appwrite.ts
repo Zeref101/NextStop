@@ -116,8 +116,6 @@ export async function getCurrentUser() {
       username: document.username,
     });
 
-    console.log("response object -->", responseObj);
-
     return responseObj;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
