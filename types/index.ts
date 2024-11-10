@@ -38,3 +38,41 @@ export interface AuthContextProps {
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   setUser: Dispatch<SetStateAction<UserProps | null>>;
 }
+
+export enum ViewState {
+  Places = "Places",
+  Food = "Food",
+  BestTime = "BestTime",
+}
+
+// TypeScript interface for the food data response
+export interface FoodItem {
+  title: string;
+  img_url: string;
+  description: string;
+  details_link: string;
+}
+
+export interface FoodInfo {
+  general_description: string;
+  food_items: FoodItem[];
+}
+
+export interface FoodResponse {
+  food_info: FoodInfo;
+}
+
+export interface ErrorResponse {
+  error: string;
+}
+export interface MonthlyWeather {
+  month: string;
+  high: string;
+  low: string;
+}
+
+// Interface for Best Time to Visit Data
+export interface BestTimeToVisit {
+  best_time_to_visit: string;
+  monthly_weather: MonthlyWeather[];
+}
