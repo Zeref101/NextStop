@@ -1,5 +1,4 @@
 import { ErrorResponse, FoodResponse } from "@/types";
-import { IP_ADDR } from "@env";
 
 function isFoodResponse(
   data: FoodResponse | ErrorResponse
@@ -10,7 +9,7 @@ function isFoodResponse(
 export const fetchFoodData = async (
   place: string
 ): Promise<FoodResponse | ErrorResponse> => {
-  const url = `http://${IP_ADDR}/food/${place}`;
+  const url = `http://54.210.58.161/food/${place}`;
 
   try {
     const response = await fetch(url);

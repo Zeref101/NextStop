@@ -1,5 +1,4 @@
 import { BestTimeToVisit, ErrorResponse, FoodResponse } from "@/types";
-import { IP_ADDR } from "@env";
 
 function isBestTimeResponse(
   data: BestTimeToVisit | ErrorResponse
@@ -10,7 +9,7 @@ function isBestTimeResponse(
 export const fetchBestTimeData = async (
   place: string
 ): Promise<BestTimeToVisit | ErrorResponse> => {
-  const url = `http://${IP_ADDR}/best-time-to-visit/${place}`;
+  const url = `http://54.210.58.161/best-time-to-visit/${place}`;
 
   try {
     const response = await fetch(url);
