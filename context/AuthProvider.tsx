@@ -1,11 +1,18 @@
 import { getCurrentUser } from "@/lib/appwrite";
-import { createContext, useState, useContext, Children } from "react";
+import { createContext, useState, useContext } from "react";
 import { ReactNode } from "react";
 import React from "react";
 import { UserProps } from "@/types";
+import { AuthContextProps } from "@/types";
 
-const AuthContext = createContext({
 
+const AuthContext = createContext<AuthContextProps>({
+    isLoggedIn: false,
+    setIsLoggedIn: () => { },
+    user: null,
+    isLoading: true,
+    setIsLoading: () => { },
+    setUser: () => { }
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -33,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setIsLoading, setUser }}>
+        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, isLoading, setIsLoading, setUser }}>
             {children}
         </AuthContext.Provider>
     )
