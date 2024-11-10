@@ -1,53 +1,65 @@
-import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, ActivityIndicator, Modal, Button } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthProvider';
 import icons from '@/constants/icons';
 import axios from 'axios';
+import { IP_ADDR } from '@env';
 import images from '@/constants/images';
+import CustomButton from '@/components/CustomButton';
 
 const Search = () => {
     const [query, setQuery] = React.useState("");
     const [isFocused, setIsFocused] = React.useState(false);
-    const [searchQuery, setSearchQuery] = React.useState("");  // State for query passed to SearchResults
+    const [searchQuery, setSearchQuery] = React.useState("");
     const [results, setResults] = React.useState<any[]>([]);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [selectedResult, setSelectedResult] = React.useState<any>(null);
     const { user } = useAuth();
 
     const handleSearch = () => {
         if (query !== searchQuery) {
-            setSearchQuery(query);  // Set the query to searchQuery when search icon is clicked
+            setSearchQuery(query);
         }
     }
 
-    // useEffect hook to fetch results whenever searchQuery changes
+    const openModal = (result: any) => {
+        setSelectedResult(result);
+        setModalVisible(true);
+    }
+
+    const closeModal = () => {
+        setModalVisible(false);
+        setSelectedResult(null);
+    }
+
     React.useEffect(() => {
-        if (searchQuery === "") return; // Prevent API call if searchQuery is empty
+        if (searchQuery === "") return;
 
         console.log("useEffect triggered with searchQuery:", searchQuery);
 
         const fetchResults = async () => {
-            setIsLoading(true); // Set loading state to true before starting the fetch
-            setError(null); // Clear any previous errors
+            setIsLoading(true);
+            setError(null);
 
             try {
                 console.log("Fetching results for query:", searchQuery);
-                // Make an HTTP GET request using axios
-                const response = await axios.get(`http://44.203.99.91/places/${searchQuery}`);
+                const response = await axios.get(`http://${IP_ADDR}/places/${searchQuery}`);
                 console.log("Fetch successful, response data:", response.data);
-                setResults(response.data.places_info); // Set the results state with the fetched data
+                setResults(response.data.places_info);
             } catch (err) {
-                setError('Failed to fetch results'); // Set error state if the fetch fails
-                console.error("Fetch error:", err); // Log the error to the console
+                setError('Failed to fetch results');
+                console.error("Fetch error:", err);
             } finally {
-                setIsLoading(false); // Set loading state to false after the fetch completes
+                setIsLoading(false);
                 console.log("Fetch operation completed");
             }
         };
 
-        fetchResults(); // Call the fetchResults function
-    }, [searchQuery]); // Dependency array to re-run the effect when searchQuery changes
+        fetchResults();
+    }, [searchQuery]);
 
     return (
         <SafeAreaView className='bg-primary h-full'>
@@ -90,21 +102,38 @@ const Search = () => {
                 ) : results.length > 0 ? (
                     <ScrollView>
                         {results.map((result, index) => (
-                            <View key={index} className='mb-4 flex flex-col p-8 bg-[#1E1E2D] rounded-xl m-4'>
-                                <View className=' flex-1 flex-row justify-between items-center'>
-                                    <Text className='text-lg text-white font-psemibold'>{result.title}</Text>
-                                    <Image className='w-6 h-6' source={icons.menu} resizeMode='contain' />
+                            <TouchableOpacity key={index} onPress={() => openModal(result)}>
+                                <View className='mb-4 flex flex-col p-8 bg-[#1E1E2D] rounded-xl m-4'>
+                                    <View className=' flex-1 flex-row justify-between items-center'>
+                                        <Text className='text-lg text-white font-psemibold'>{result.title}</Text>
+                                        <Image className='w-6 h-6' source={icons.menu} resizeMode='contain' />
+                                    </View>
+                                    <Image source={{ uri: result.img_url }} className='w-full mt-4 h-[250px] ' resizeMode='cover' style={{ borderRadius: 15 }} />
                                 </View>
-
-
-                                <Image source={{ uri: result.img_url }} className='w-full mt-4 h-[250px] ' resizeMode='cover' style={{ borderRadius: 15 }} />
-
-
-                            </View>
+                            </TouchableOpacity>
                         ))}
                     </ScrollView>
                 ) : (
                     <Image source={images.empty} className=' w-full' resizeMode='contain' />
+
+                )}
+
+                {selectedResult && (
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={closeModal}
+                        className=' bg-[#1E1E2D]'
+                    >
+                        <View className='flex-1 justify-center items-center bg-primary opacity-85'>
+                            <View className=' bg-[#1E1E2D] text-white p-8 rounded-xl w-3/4 border-2 border-secondary'>
+                                <Text className='text-2xl font-psemibold text-white'>{selectedResult.title}</Text>
+                                <Text className='mt-4 text-base font-pregular text-white'>{selectedResult.description}</Text>
+                                <CustomButton title="Close" handlePress={closeModal} containerStyles=' m-4' />
+                            </View>
+                        </View>
+                    </Modal>
                 )}
 
             </ScrollView>
