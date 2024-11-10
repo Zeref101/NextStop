@@ -7,6 +7,10 @@ import axios from 'axios';
 import { IP_ADDR } from '@env';
 import images from '@/constants/images';
 import CustomButton from '@/components/CustomButton';
+import { ErrorResponse, FoodResponse, ViewState } from '@/types';
+import Options from '@/components/Options';
+import { fetchFoodData } from '@/lib/foodService';
+import { fetchBestTimeData } from '@/lib/bestTime';
 
 const Search = () => {
     const [query, setQuery] = React.useState("");
@@ -17,12 +21,27 @@ const Search = () => {
     const [error, setError] = React.useState<string | null>(null);
     const [modalVisible, setModalVisible] = React.useState(false);
     const [selectedResult, setSelectedResult] = React.useState<any>(null);
-    const { user } = useAuth();
+    const [state, setState] = React.useState<ViewState>(ViewState.Places);
+    const [foodResponse, setFoodResponse] = React.useState<FoodResponse | ErrorResponse>();
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
+        console.log(state)
         if (query !== searchQuery) {
             setSearchQuery(query);
         }
+        if (query !== "" && state === "Food") {
+            console.log(query)
+            const response = await fetchFoodData(query);
+            console.log(response);
+
+        }
+        if (query !== "" && state === "BestTime") {
+            console.log(query)
+            const response = await fetchBestTimeData(query);
+            console.log(response);
+
+        }
+
     }
 
     const openModal = (result: any) => {
@@ -34,32 +53,36 @@ const Search = () => {
         setModalVisible(false);
         setSelectedResult(null);
     }
+    const handleStateChange = async (newState: ViewState) => {
+        setState(newState);
 
-    React.useEffect(() => {
-        if (searchQuery === "") return;
+    };
 
-        console.log("useEffect triggered with searchQuery:", searchQuery);
+    // React.useEffect(() => {
+    //     if (searchQuery === "") return;
 
-        const fetchResults = async () => {
-            setIsLoading(true);
-            setError(null);
+    //     console.log("useEffect triggered with searchQuery:", searchQuery);
 
-            try {
-                console.log("Fetching results for query:", searchQuery);
-                const response = await axios.get(`http://${IP_ADDR}/places/${searchQuery}`);
-                console.log("Fetch successful, response data:", response.data);
-                setResults(response.data.places_info);
-            } catch (err) {
-                setError('Failed to fetch results');
-                console.error("Fetch error:", err);
-            } finally {
-                setIsLoading(false);
-                console.log("Fetch operation completed");
-            }
-        };
+    //     const fetchResults = async () => {
+    //         setIsLoading(true);
+    //         setError(null);
 
-        fetchResults();
-    }, [searchQuery]);
+    //         try {
+    //             console.log("Fetching results for query:", searchQuery);
+    //             const response = await axios.get(`http://${IP_ADDR}/places/${searchQuery}`);
+    //             console.log("Fetch successful, response data:", response.data);
+    //             setResults(response.data.places_info);
+    //         } catch (err) {
+    //             setError('Failed to fetch results');
+    //             console.error("Fetch error:", err);
+    //         } finally {
+    //             setIsLoading(false);
+    //             console.log("Fetch operation completed");
+    //         }
+    //     };
+
+    //     fetchResults();
+    // }, [searchQuery]);
 
     return (
         <SafeAreaView className='bg-primary h-full'>
@@ -94,7 +117,7 @@ const Search = () => {
                         </View>
                     </View>
                 </View>
-
+                <Options handleStateChange={handleStateChange} state={state} />
                 {isLoading ? (
                     <ActivityIndicator size="large" color="#0000ff" />
                 ) : error ? (
