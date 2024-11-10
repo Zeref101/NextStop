@@ -6,8 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import images from '@/constants/images';
 import CustomButton from '@/components/CustomButton';
 import Toast from 'react-native-toast-message';
+import { useAuth } from '@/context/AuthProvider';
 
 const Index = () => {
+    const { isLoggedIn, setIsLoggedIn, user, isLoading, setIsLoading, setUser } = useAuth();
+
+    if (isLoggedIn && !isLoading) {
+        return <Redirect href={'/home'} />
+    }
     return (
         <SafeAreaView className=' bg-primary h-full'>
             <ScrollView contentContainerStyle={{ height: "100%" }}>
