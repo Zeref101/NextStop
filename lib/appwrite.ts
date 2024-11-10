@@ -46,6 +46,7 @@ export const createUser = async ({
     // Generate avatar initials
     const avatarUrl = avatars.getInitials(username);
 
+    await signin(email, password);
     // Create a new document in the database
     const newUser = await database.createDocument(
       appwriteConfig.databaseId,
@@ -80,18 +81,22 @@ export async function signin(email: string, password: string) {
 export async function getAccount() {
   try {
     const currentAccount = await account.get();
+    console.log("account----->", currentAccount);
     return currentAccount;
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : String(error));
+    console.error(error);
+    throw error;
   }
 }
+// console.log("account----->", getAccount());
+
 // ? GET CURRENT USER INFORMATION
 export async function getCurrentUser() {
   try {
     const currentAccount = await account.get(); // Await the promise
-    console.log(currentAccount);
+    // console.log(currentAccount);
     if (!currentAccount) {
-      console.log("oasdoaisjdoiajdoia");
+      // console.log("oasdoaisjdoiajdoia");
       throw new Error("No current account found");
     }
 
@@ -100,13 +105,25 @@ export async function getCurrentUser() {
       appwriteConfig.usersCollectionId,
       [Query.equal("accountId", currentAccount.$id)]
     );
-    if (!currentUser) throw new Error("No current user found");
+    // console.log("liiiiiiiiiiiiiist", currentUser);
+    const document = currentUser.documents[0];
+    if (!document.$id) throw new Error("No current user found");
 
-    return currentUser;
+    const responseObj = new Object({
+      accountId: document.accountId,
+      avatar: document.avatar,
+      email: document.email,
+      username: document.username,
+    });
+
+    console.log("response object -->", responseObj);
+
+    return responseObj;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
+
 // ? Sign Out
 export async function signOut() {
   try {
