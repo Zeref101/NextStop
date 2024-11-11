@@ -9,7 +9,7 @@ function isFoodResponse(
 export const fetchFoodData = async (
   place: string
 ): Promise<FoodResponse | ErrorResponse> => {
-  const url = `http://54.210.58.161/food/${place}`;
+  const url = `http://100.27.153.27/food/${place}`;
 
   try {
     const response = await fetch(url);

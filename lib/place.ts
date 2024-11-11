@@ -1,4 +1,9 @@
-import { ErrorResponse, PlacesResponse } from "@/types";
+import {
+  ErrorResponse,
+  PlacesProps,
+  PlacesResponse,
+  PlacesResponseHome,
+} from "@/types";
 
 function isPlaceResponse(
   data: PlacesResponse | ErrorResponse
@@ -9,7 +14,7 @@ function isPlaceResponse(
 export const fetchPlaceData = async (
   place: string
 ): Promise<PlacesResponse | ErrorResponse> => {
-  const url = `http://54.210.58.161/places/${place}`;
+  const url = `http://100.27.153.27/places/${place}`;
 
   try {
     const response = await fetch(url);
@@ -23,4 +28,38 @@ export const fetchPlaceData = async (
   } catch (error) {
     return { error: "Failed to fetch place data. Please try again later." };
   }
+};
+
+export const fetchPlacesPropsData = async (
+  place: string
+): Promise<PlacesProps | { error: string }> => {
+  const url = `http://100.27.153.27/places-by-month/november`;
+
+  try {
+    const response = await fetch(url);
+    const data: PlacesResponseHome | { error: string } = await response.json();
+
+    if (isPlacesResponseHome(data)) {
+      return { data: data as PlacesResponseHome };
+    } else {
+      return { error: "No places data found for this place." };
+    }
+  } catch (error) {
+    return { error: "Failed to fetch places data. Please try again later." };
+  }
+};
+
+// Type guard to check if data is of type PlacesResponseHome
+const isPlacesResponseHome = (data: any): data is PlacesResponseHome => {
+  return (
+    data &&
+    typeof data.general_description === "string" &&
+    Array.isArray(data.places_data) &&
+    data.places_data.every(
+      (place: any) =>
+        typeof place.title === "string" &&
+        typeof place.image_url === "string" &&
+        typeof place.description === "string"
+    )
+  );
 };
