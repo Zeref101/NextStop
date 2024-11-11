@@ -85,3 +85,17 @@ export interface PlaceInfo {
 export interface PlacesResponse {
   places_info: PlaceInfo[];
 }
+export interface PlaceData {
+  title: string;
+  image_url: string;
+  description: string;
+}
+
+export interface PlacesResponseHome {
+  general_description: string;
+  places_data: PlaceData[];
+}
+
+export interface PlacesProps {
+  data: PlacesResponseHome;
+}
