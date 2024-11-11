@@ -10,6 +10,8 @@ import Options from '@/components/Options';
 import { fetchFoodData } from '@/lib/foodService';
 import { fetchBestTimeData } from '@/lib/bestTime';
 import { fetchPlaceData } from '@/lib/place';
+import { useAuth } from '@/context/AuthProvider';
+import { savePlace } from '@/lib/appwrite';
 
 const Search = () => {
     const [query, setQuery] = React.useState("");
@@ -24,8 +26,10 @@ const Search = () => {
     const [foodResponse, setFoodResponse] = React.useState<FoodResponse | ErrorResponse>();
     const [bestTime, setBestTime] = React.useState<BestTimeToVisit | ErrorResponse>()
     const [showFullText, setShowFullText] = React.useState(false);
-    const [selectedFood, setSelectedFood] = React.useState<any>()
-    const [foodModalVisible, setFoodModalVisible] = React.useState(false)
+    const [selectedFood, setSelectedFood] = React.useState<any>();
+    const [foodModalVisible, setFoodModalVisible] = React.useState(false);
+    const [menuVisibleIndex, setMenuVisibleIndex] = React.useState<number | null>(null);
+    const { user } = useAuth();
 
     const handleSearch = async () => {
         if (query !== searchQuery) {
@@ -90,6 +94,23 @@ const Search = () => {
 
     };
 
+    const handleSavePlace = async (placeInfo: any) => {
+        if (placeInfo && user?.accountId) {
+            const placeData = {
+                title: placeInfo.title,
+                img_url: placeInfo.img_url,
+                description: placeInfo.description,
+            };
+            try {
+                await savePlace(placeData, user.accountId);
+                console.log("Place saved successfully!");
+                setMenuVisibleIndex(null);
+            } catch (error) {
+                console.error("Error saving place:", error);
+            }
+        }
+    };
+
     return (
         <SafeAreaView className='bg-primary h-full'>
             <ScrollView>
@@ -125,21 +146,31 @@ const Search = () => {
                 </View>
                 <Options handleStateChange={handleStateChange} state={state} />
                 {isLoading ? (
-                    <ActivityIndicator size="large" color="#0000ff" />
+                    <ActivityIndicator size="large" color="#FF9C01" className=' mt-36' />
                 ) : error ? (
                     <Text className='text-red-500'>{error}</Text>
                 ) : Array.isArray(results) || Array.isArray(foodResponse) || Array.isArray(bestTime) ? (
                     <ScrollView>
                         {state === ViewState.Places ? results?.map((result, index) => (
-                            <TouchableOpacity key={index} onPress={() => openModal(result)}>
-                                <View className='mb-4 flex flex-col p-8 bg-[#1E1E2D] rounded-xl m-4'>
-                                    <View className=' flex-1 flex-row justify-between items-center'>
-                                        <Text className='text-lg text-white font-psemibold'>{result.title}</Text>
+                            <View className='mb-4 flex flex-col p-8 bg-[#1E1E2D] rounded-xl m-4' key={index}>
+                                <View className=' flex-1 flex-row justify-between items-center'>
+                                    <Text className='text-lg text-white font-psemibold'>{result.title}</Text>
+                                    <TouchableOpacity onPress={() => { menuVisibleIndex === index ? setMenuVisibleIndex(null) : setMenuVisibleIndex(index) }}>
+
                                         <Image className='w-6 h-6' source={icons.menu} resizeMode='contain' />
-                                    </View>
-                                    <Image source={{ uri: result.img_url }} className='w-full mt-4 h-[250px] ' resizeMode='cover' style={{ borderRadius: 15 }} />
+                                    </TouchableOpacity>
                                 </View>
-                            </TouchableOpacity>
+                                {menuVisibleIndex === index && (
+                                    <View className='absolute top-[60px] right-12 bg-black-200 rounded-xl w-24 z-10 p-4'>
+                                        <TouchableOpacity onPress={() => handleSavePlace(result)}>
+                                            <Text className="text-white">Save</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                                <TouchableOpacity key={index} onPress={() => openModal(result)}>
+                                    <Image source={{ uri: result.img_url }} className='w-full mt-4 h-[250px] ' resizeMode='cover' style={{ borderRadius: 15 }} />
+                                </TouchableOpacity>
+                            </View>
                         )) : null}
                         {state === ViewState.Food && foodResponse && 'food_info' in foodResponse && (
                             <>
@@ -150,13 +181,13 @@ const Search = () => {
                                     {/* General Description Section */}
                                     <View className='rounded-xl bg-[#1E1E2D] p-4 m-4'>
                                         <Text
-                                            className='text-white text-base font-pregular'
+                                            className='text-white text-base font-pregular '
                                             numberOfLines={showFullText ? undefined : 10}
                                         >
                                             {foodResponse?.food_info.general_description}
                                         </Text>
                                         <TouchableOpacity onPress={() => setShowFullText(!showFullText)}>
-                                            <Text className='text-secondary mt-2'>
+                                            <Text className='text-secondary mt-2 font-pregular'>
                                                 {showFullText ? "Show Less" : "Read More"}
                                             </Text>
                                         </TouchableOpacity>
@@ -166,7 +197,7 @@ const Search = () => {
                                             if (food?.title !== "Unknown Title" && food?.img_url !== null) {
                                                 return (
                                                     <TouchableOpacity key={index} onPress={() => openFoodModal(food)}>
-                                                        <View className='mb-4 flex flex-col p-8 bg-[#1E1E2D] rounded-xl m-4'>
+                                                        <View className='mb-4 flex flex-col p-8 bg-[#1E1E2D] rounded-xl m-4' key={index}>
                                                             <Text className='text-lg text-white font-psemibold'>{food?.title}</Text>
 
                                                             <Image
