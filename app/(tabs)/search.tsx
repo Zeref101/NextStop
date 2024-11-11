@@ -78,7 +78,7 @@ const Search = () => {
     }
     const closeFoodModal = () => {
         setSelectedResult(null);
-        setModalVisible(false);
+        setFoodModalVisible(false);
     }
 
     const closeModal = () => {
@@ -89,32 +89,6 @@ const Search = () => {
         setState(newState);
 
     };
-
-    React.useEffect(() => {
-        if (searchQuery === "") return;
-
-        console.log("useEffect triggered with searchQuery:", searchQuery);
-
-        const fetchResults = async () => {
-            setIsLoading(true);
-            setError(null);
-
-            try {
-                console.log("Fetching results for query:", searchQuery);
-                const response = await axios.get(`http://54.210.58.161/places/${searchQuery}`);
-                console.log("Fetch successful, response data:", response.data);
-                setResults(response.data.places_info);
-            } catch (err) {
-                setError('Failed to fetch results');
-                console.error("Fetch error:", err);
-            } finally {
-                setIsLoading(false);
-                console.log("Fetch operation completed");
-            }
-        };
-
-        fetchResults();
-    }, [searchQuery]);
 
     return (
         <SafeAreaView className='bg-primary h-full'>
@@ -150,7 +124,6 @@ const Search = () => {
                     </View>
                 </View>
                 <Options handleStateChange={handleStateChange} state={state} />
-                <Text>{state}</Text>
                 {isLoading ? (
                     <ActivityIndicator size="large" color="#0000ff" />
                 ) : error ? (
@@ -216,6 +189,59 @@ const Search = () => {
                                 </View>
                             </>
                         )}
+                        {state === ViewState.BestTime && bestTime && 'best_time_to_visit' in bestTime && (
+                            <>
+                                <View className='flex flex-col justify-center items-center'>
+                                    <Text className='text-pretty font-pbold text-white text-[18px]'>Ideal Time to visit {query}</Text>
+
+                                    <View className='rounded-xl bg-[#1E1E2D] p-4 m-4'>
+                                        <Text
+                                            className='text-white text-base font-pregular'
+                                            numberOfLines={showFullText ? undefined : 10}
+                                        >
+                                            {bestTime?.best_time_to_visit}
+                                        </Text>
+                                        <TouchableOpacity onPress={() => setShowFullText(!showFullText)}>
+                                            <Text className='text-secondary mt-2'>
+                                                {showFullText ? "Show Less" : "Read More"}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    {'monthly_weather' in bestTime && (
+                                        <>
+                                            <Text className='text-pretty font-pbold text-white text-[18px]'>Weather in {query}</Text>
+                                            <View className="h-[50px] mx-8 flex-row justify-between rounded-xl border border-[#7b7b8b] mb-2 bg-[#2A2A3C]">
+                                                <View className="flex-1 h-full justify-center items-center border-r-2 border-[#7b7b8b]">
+                                                    <Text className="text-center text-base font-pmedium text-white">Month</Text>
+                                                </View>
+                                                <View className="flex-1 h-full justify-center items-center border-r-2 border-[#7b7b8b]">
+                                                    <Text className="text-center text-base font-pmedium text-white">High</Text>
+                                                </View>
+                                                <View className="flex-1 h-full justify-center items-center">
+                                                    <Text className="text-center text-base font-pmedium text-white">Low</Text>
+                                                </View>
+                                            </View>
+                                            {bestTime?.monthly_weather.map((weather, index) => (
+                                                <View key={index} className="h-[50px] mx-8 flex-row justify-between rounded-xl border border-[#7b7b8b] mb-2">
+                                                    <View className="flex-1 h-full justify-center items-center border-r-2 border-[#7b7b8b]">
+                                                        <Text className="text-center text-base font-pmedium text-white">{weather.month}</Text>
+                                                    </View>
+                                                    <View className="flex-1 h-full justify-center items-center border-r-2 border-[#7b7b8b]">
+                                                        <Text className="text-center text-base font-pmedium text-white">{weather.high}°</Text>
+                                                    </View>
+                                                    <View className="flex-1 h-full justify-center items-center">
+                                                        <Text className="text-center text-base font-pmedium text-white">{weather.low}°</Text>
+                                                    </View>
+                                                </View>
+                                            ))}
+
+                                        </>
+                                    )}
+                                </View>
+
+                            </>
+                        )}
 
                     </ScrollView>
                 ) : (
@@ -240,10 +266,11 @@ const Search = () => {
                         </View>
                     </Modal>
                 )}
+
                 {/* FOOD MODAL */}
                 {selectedFood && (
                     <Modal
-                        animationType="slide"
+                        animationType="fade"
                         transparent={true}
                         visible={foodModalVisible}
                         onRequestClose={closeFoodModal}
@@ -258,7 +285,6 @@ const Search = () => {
                         </View>
                     </Modal>
                 )}
-
             </ScrollView>
         </SafeAreaView>
     )
