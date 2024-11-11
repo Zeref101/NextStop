@@ -15,6 +15,8 @@ const SignIn = () => {
         password: ''
     })
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [loggedIn, setLoggedIn] = React.useState(false);
+
     const submit = async () => {
         if (!form.email || !form.password) {
             Toast.show({
@@ -25,16 +27,37 @@ const SignIn = () => {
                 visibilityTime: 4000,
                 autoHide: true,
                 topOffset: 30
-            })
+            });
         } else {
+            try {
+                const session = await signin(form.email, form.password); // Create session
 
-            const session = await signin(form.email, form.password);
-            const user = await getCurrentUser();
+                if (session) {
+                    setLoggedIn(true); // Set loggedIn to true on success
+                }
 
-            if (user) {
-                return <Redirect href={'/home'} />
+            } catch (error) {
+                Toast.show({
+                    type: "error",
+                    text1: 'Login Failed',
+                    text2: 'An error occurred during login',
+                    position: 'top',
+                    visibilityTime: 4000,
+                    autoHide: true,
+                    topOffset: 30
+                });
             }
         }
+    };
+    console.log(loggedIn)
+    // Redirect to home if logged in
+    if (loggedIn) {
+        return <Redirect href={'/home'} />;
+    }
+
+    // Redirect to home if logged in
+    if (loggedIn) {
+        return <Redirect href={'/home'} />;
     }
     return (
         <SafeAreaView className=' bg-primary h-full'>
