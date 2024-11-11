@@ -1,7 +1,8 @@
-import { SplashScreen, Stack } from 'expo-router'
-import React from 'react'
-import { AuthProvider } from '@/context/AuthProvider'
+import { Stack } from 'expo-router';
+import React from 'react';
+import { AuthProvider } from '@/context/AuthProvider';
 import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -17,32 +18,30 @@ const RootLayout = () => {
         "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
         "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
         "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
-    })
+    });
 
     React.useEffect(() => {
         if (fontsLoaded) {
             SplashScreen.hideAsync();
         }
     }, [fontsLoaded, error]);
-    if (!fontsLoaded) {
-        return null;
-    }
 
-    if (!fontsLoaded && !error) {
+    if (!fontsLoaded) {
         return null;
     }
 
     return (
         <>
             <AuthProvider>
-                <Stack>
-                    <Stack.Screen name='index' options={{ headerShown: false }} />
-                    <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name='index' />
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="(tabs2)" />
                 </Stack>
             </AuthProvider>
         </>
-    )
+    );
 }
 
-export default RootLayout
+export default RootLayout;
