@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, RefreshControl, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthProvider';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -87,6 +87,10 @@ const Home = () => {
                     <Text className="text-white font-psemibold text-[18px] mt-7">
                         Trending Places to visit
                     </Text>
+                    {isLoading && (
+                        <ActivityIndicator size="large" color="#FF9C01" />
+
+                    )}
                     <ScrollView horizontal={true} className="flex-row ">
                         {upcomingPlaces.map((place, index) => (
                             <View key={index} className="w-80 p-2 bg-black-100 rounded-lg m-2 flex flex-col items-center justify-center">
